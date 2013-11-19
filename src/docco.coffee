@@ -336,7 +336,7 @@ destination = (filepath, context) ->
 
 # Ensure that the destination directory exists.
 ensure_directory = (dir, callback) ->
-  exec "mkdir -p #{dir}", -> callback()
+  exec "mkdir #{dir}", -> callback()
 
 file_exists = (path) ->
   try 

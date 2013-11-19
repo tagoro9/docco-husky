@@ -132,6 +132,13 @@ parse = (source, code) ->
 # wherever our markers occur.
 highlight = (source, sections, callback) ->
   language = get_language source
+  for section, i in sections
+    code = highlightjs.highlight(language.name, section.code_text).value
+    code = code.replace(/\s+$/, '')
+    section.code_html = highlight_start + code + highlight_end
+    section.docs_html = showdown.makeHtml section.docs_text
+  callback()  
+  ###
   pygments = spawn 'pygmentize', ['-l', language.name, '-f', 'html', '-O', 'encoding=utf-8,tabsize=2']
   output   = ''
   
@@ -156,6 +163,7 @@ highlight = (source, sections, callback) ->
   if pygments.stdin.writable
     pygments.stdin.write((section.code_text for section in sections).join(language.divider_text))
     pygments.stdin.end()
+  ###
   
 # Once all of the code is finished highlighting, we can generate the HTML file
 # and write out the documentation. Pass the completed sections into the template
@@ -193,23 +201,23 @@ generate_readme = (context, sources, package_json) ->
     content = "There is no #{source} for this project yet :( "
   
   # run cloc 
-  cloc sources.join(" "), (code_stats) ->
+  #cloc sources.join(" "), (code_stats) ->
 
-    html = readme_template {
-      title: title, 
-      context: context, 
-      content: content, 
-      content_index: content_index,
-      file_path: source, 
-      path: path, 
-      relative_base: relative_base, 
-      package_json: package_json, 
-      code_stats: code_stats, 
-      gravatar: gravatar
-    }
-    
-    console.log "docco: #{source} -> #{dest}"
-    write_file(dest, html)
+  html = readme_template {
+    title: title, 
+    context: context, 
+    content: content, 
+    content_index: content_index,
+    file_path: source, 
+    path: path, 
+    relative_base: relative_base, 
+    package_json: package_json, 
+    code_stats: "", 
+    gravatar: gravatar
+  }
+  
+  console.log "docco: #{source} -> #{dest}"
+  write_file(dest, html)
 
 generate_content = (context, dir) ->
   walker = walk.walk(dir, { followLinks: false });    
@@ -266,6 +274,7 @@ dox      = require 'dox'
 gravatar = require 'gravatar'
 _        = require 'underscore'
 walk     = require 'walk'
+highlightjs = require 'highlight.js'
 {spawn, exec} = require 'child_process'
 
 # A list of the languages that Docco supports, mapping the file extension to
@@ -362,16 +371,16 @@ parse_args = (callback) ->
   project_name = ""
 
   # Optional Project name following -name option
-  if args[0] == "-name"
+  if args? and args[0] == "-name"
     args.shift()
     project_name = args.shift()
 
   # Sort the list of files and directories
-  args = args.sort()
+  args = args.sort() if args?
 
   # Preserving past behavior: if no args are given, we do nothing (eventually
   # display help?)
-  return unless args.length
+  return unless args? and args.length
 
   # Collect all of the directories or file paths to then pass onto the 'find'
   # command

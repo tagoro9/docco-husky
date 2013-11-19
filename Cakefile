@@ -3,7 +3,7 @@
 option '-p', '--prefix [DIR]', 'set the installation prefix for `cake install`'
 
 task 'build', 'continually build the docco library with --watch', ->
-  coffee = spawn 'coffee', ['-cw', '-o', 'lib', 'src']
+  coffee = exec "coffee #{['-cw', '-o', 'lib', 'src'].join ' '}"
   coffee.stdout.on 'data', (data) -> console.log data.toString().trim()
 
 task 'install', 'install the `docco` command into /usr/local (or --prefix)', (options) ->
@@ -30,7 +30,7 @@ task 'test', 'test the doc generator', ->
   exec([
     'rm -rf test/docs'
     'cd test'
-    '../bin/generate .'
+    'node ../bin/generate .'
   ].join(' && '), (err) ->
     throw err if err
   )

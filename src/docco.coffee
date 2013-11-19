@@ -247,8 +247,8 @@ write_file = (dest, contents) ->
       return write_func() unless err
 
       if err
-        exec "mkdir -p #{target_dir}", (err) ->
-          throw err if err
+        exec "mkdir #{target_dir.replace /\//g, "\\"}", (err) ->
+          throw err if err and err.code isnt 1
           write_func()
 
 
@@ -284,7 +284,6 @@ languages =
   ".coffee":      {"name": "coffeescript", "symbol": "#"}
   ".litcoffee":   {"name": "coffeescript", "symbol": "#", "literate": true}
   "Cakefile":     {"name": "coffeescript", "symbol": "#"}
-  ".js":          {"name": "javascript", "symbol": "//"}
   ".java":        {"name": "java", "symbol": "//"}
 
 # Build out the appropriate matchers and delimiters for each language.
@@ -336,7 +335,7 @@ destination = (filepath, context) ->
 
 # Ensure that the destination directory exists.
 ensure_directory = (dir, callback) ->
-  exec "mkdir #{dir}", -> callback()
+  exec "mkdir #{dir.replace "/", "\\"}", -> callback()
 
 file_exists = (path) ->
   try 

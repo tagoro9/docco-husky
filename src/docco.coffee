@@ -281,16 +281,11 @@ highlightjs = require 'highlight.js'
 # the name of the Pygments lexer and the symbol that indicates a comment. To
 # add another language to Docco's repertoire, add it here.
 languages =
-  '.coffee':
-    name: 'coffee-script', symbol: '#'
-  '.js':
-    name: 'javascript', symbol: '//', multi_start: "/*", multi_end: "*/"
-  '.rb':
-    name: 'ruby', symbol: '#'
-  '.py':
-    name: 'python', symbol: '#'
-  '.java':
-    name: 'java', symbol: '//', multi_start: "/*", multi_end: "*/"
+  ".coffee":      {"name": "coffeescript", "symbol": "#"}
+  ".litcoffee":   {"name": "coffeescript", "symbol": "#", "literate": true}
+  "Cakefile":     {"name": "coffeescript", "symbol": "#"}
+  ".js":          {"name": "javascript", "symbol": "//"}
+  ".java":        {"name": "java", "symbol": "//"}
 
 # Build out the appropriate matchers and delimiters for each language.
 for ext, l of languages
@@ -324,7 +319,9 @@ for ext, l of languages
 
 
 # Get the current language we're documenting, based on the extension.
-get_language = (source) -> languages[path.extname(source)]
+get_language = (source) -> 
+  ext  = path.extname(source) or path.basename(source)
+  languages[ext]
 
 # Compute the path of a source file relative to the docs folder
 relative_base = (filepath, context) ->

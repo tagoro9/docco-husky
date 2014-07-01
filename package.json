@@ -36,7 +36,7 @@
     "gravatar": "1.0.3",
     "underscore": "1.2.x",
     "walk": "2.0.2",
-    "highlight.js": ">= 7.3.0"    
+    "highlight.js": "7.3.0"    
   },
   "directories": {
     "lib": "./lib"
